@@ -1,0 +1,425 @@
+/* ═══════════════════════════════════════════
+   Ῥήματα Ἑλληνικά — styles.css
+   ═══════════════════════════════════════════ */
+
+:root {
+  --parchment: #f5ead6;
+  --ink: #1a0f00;
+  --red: #8b1a1a;
+  --gold: #b8860b;
+  --faded: #7a6040;
+  --line: #c8a96e;
+  --bg: #2a1a06;
+  --act-head: #1b3320;
+  --mid-head: #2a1a38;
+  --pass-head: #1a2535;
+  --imp-head: #3a1a0a;
+  --prep-head: #1a1a35;
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+  background: var(--bg);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 40px 20px 60px;
+  font-family: 'IM Fell English', serif;
+}
+
+/* ── Page container ── */
+.page {
+  background: var(--parchment);
+  max-width: 1340px;
+  width: 100%;
+  border: 3px solid var(--gold);
+  box-shadow:
+    0 0 0 8px var(--bg),
+    0 0 0 12px var(--gold),
+    0 20px 60px rgba(0,0,0,.6);
+  padding: 46px 52px 52px;
+  position: relative;
+  background-image:
+    radial-gradient(ellipse at 18% 8%, rgba(184,134,11,.09) 0%, transparent 50%),
+    radial-gradient(ellipse at 82% 92%, rgba(139,26,26,.06) 0%, transparent 50%);
+}
+
+/* ── Corner decorations ── */
+.corner {
+  position: absolute;
+  width: 50px;
+  height: 50px;
+  border-color: var(--gold);
+  border-style: solid;
+}
+.corner.tl { top: 12px; left: 12px; border-width: 2px 0 0 2px; }
+.corner.tr { top: 12px; right: 12px; border-width: 2px 2px 0 0; }
+.corner.bl { bottom: 12px; left: 12px; border-width: 0 0 2px 2px; }
+.corner.br { bottom: 12px; right: 12px; border-width: 0 2px 2px 0; }
+
+/* ── Header ── */
+h1 {
+  font-family: 'Cinzel', serif;
+  font-weight: 900;
+  font-size: 2.15rem;
+  color: var(--ink);
+  text-align: center;
+  letter-spacing: .12em;
+  margin-bottom: 4px;
+}
+
+.subtitle {
+  font-family: 'IM Fell English SC', serif;
+  text-align: center;
+  color: var(--faded);
+  font-size: .85rem;
+  letter-spacing: .2em;
+  margin-bottom: 26px;
+}
+
+.divider {
+  width: 100%;
+  height: 2px;
+  background: linear-gradient(to right, transparent, var(--gold), var(--red), var(--gold), transparent);
+  margin: 12px 0;
+}
+
+/* ── Tab navigation ── */
+.tab-section { margin-bottom: 18px; }
+
+.tab-group-label {
+  font-family: 'IM Fell English SC', serif;
+  font-size: .7rem;
+  color: var(--faded);
+  letter-spacing: .2em;
+  margin-bottom: 5px;
+}
+
+.tab-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 4px;
+  margin-bottom: 7px;
+}
+
+.verb-tab {
+  font-family: 'Cinzel', serif;
+  font-size: .75rem;
+  letter-spacing: .05em;
+  padding: 5px 12px;
+  border: 1px solid var(--line);
+  background: rgba(184,134,11,.07);
+  color: var(--faded);
+  cursor: pointer;
+  transition: all .14s;
+  white-space: nowrap;
+  user-select: none;
+}
+.verb-tab:hover {
+  background: rgba(139,26,26,.1);
+  color: var(--red);
+  border-color: var(--red);
+}
+.verb-tab.active {
+  background: var(--ink);
+  color: var(--parchment);
+  border-color: var(--ink);
+  font-weight: 600;
+}
+.verb-tab.prep-tab { border-color: var(--gold); }
+.verb-tab.prep-tab.active {
+  background: var(--prep-head);
+  border-color: var(--gold);
+}
+
+/* ── Verb header ── */
+.verb-header {
+  text-align: center;
+  margin: 16px 0 12px;
+}
+.verb-title {
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  font-size: 1.3rem;
+  color: var(--red);
+  letter-spacing: .07em;
+}
+.verb-meaning {
+  font-style: italic;
+  font-size: .98rem;
+  color: var(--faded);
+  margin-top: 3px;
+}
+.verb-pp {
+  font-family: 'IM Fell English SC', serif;
+  font-size: .78rem;
+  color: var(--faded);
+  margin-top: 5px;
+  letter-spacing: .05em;
+}
+.verb-badge {
+  display: inline-block;
+  font-family: 'IM Fell English SC', serif;
+  font-size: .7rem;
+  color: var(--gold);
+  background: var(--ink);
+  padding: 2px 12px;
+  margin-top: 6px;
+  letter-spacing: .14em;
+}
+
+/* ── Navigation row (voice + mood toggles) ── */
+.nav-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-bottom: 12px;
+}
+
+.voice-toggle {
+  display: inline-flex;
+  border: 1px solid var(--line);
+  overflow: hidden;
+}
+.voice-btn {
+  font-family: 'IM Fell English SC', serif;
+  font-size: .72rem;
+  letter-spacing: .1em;
+  padding: 4px 16px;
+  background: transparent;
+  color: var(--faded);
+  cursor: pointer;
+  border: none;
+  border-right: 1px solid var(--line);
+  transition: all .14s;
+}
+.voice-btn:last-child { border-right: none; }
+.voice-btn.v-act { background: var(--act-head); color: #9dc89d; }
+.voice-btn.v-mid { background: var(--mid-head); color: #c8a8dc; }
+.voice-btn.v-pass { background: var(--pass-head); color: #90b8d8; }
+
+.mood-toggle {
+  display: inline-flex;
+  border: 1px solid var(--line);
+  overflow: hidden;
+}
+.mood-btn {
+  font-family: 'IM Fell English SC', serif;
+  font-size: .7rem;
+  letter-spacing: .08em;
+  padding: 4px 14px;
+  background: transparent;
+  color: var(--faded);
+  cursor: pointer;
+  border: none;
+  border-right: 1px solid var(--line);
+  transition: all .14s;
+}
+.mood-btn:last-child { border-right: none; }
+.mood-btn.m-active { background: var(--ink); color: var(--parchment); }
+
+/* ── Finite tables ── */
+.table-wrap {
+  overflow-x: auto;
+  margin-bottom: 4px;
+}
+
+table.ct {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .8rem;
+}
+table.ct th,
+table.ct td {
+  border: 1px solid var(--line);
+  padding: 5px 7px;
+  text-align: center;
+}
+table.ct thead th {
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  font-size: .69rem;
+  letter-spacing: .07em;
+  color: var(--parchment);
+  padding: 6px 7px;
+  white-space: nowrap;
+}
+table.ct thead th.h-act  { background: var(--act-head); }
+table.ct thead th.h-mid  { background: var(--mid-head); }
+table.ct thead th.h-pass { background: var(--pass-head); }
+table.ct thead th.h-imp  { background: var(--imp-head); }
+table.ct thead th.h-base { background: var(--ink); }
+table.ct tbody tr th {
+  font-family: 'IM Fell English SC', serif;
+  font-size: .7rem;
+  color: var(--faded);
+  background: rgba(184,134,11,.09);
+  text-align: left;
+  font-weight: normal;
+  white-space: nowrap;
+  padding: 5px 10px;
+  min-width: 36px;
+}
+table.ct tbody td { font-style: italic; color: var(--ink); white-space: nowrap; }
+table.ct tbody tr:nth-child(even) td { background: rgba(184,134,11,.05); }
+table.ct tbody tr:hover td,
+table.ct tbody tr:hover th { background: rgba(139,26,26,.07); }
+
+.d  { color: var(--faded); font-style: normal; }
+.eq { color: #666; font-style: normal; font-size: .75em; }
+
+/* ── Non-finite grid ── */
+.nf-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+.nf-block h4 {
+  font-family: 'Cinzel', serif;
+  font-size: .77rem;
+  letter-spacing: .1em;
+  color: var(--red);
+  margin-bottom: 6px;
+}
+table.nft {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .79rem;
+}
+table.nft th,
+table.nft td {
+  border: 1px solid var(--line);
+  padding: 5px 9px;
+}
+table.nft th {
+  font-family: 'IM Fell English SC', serif;
+  font-size: .7rem;
+  color: var(--faded);
+  background: rgba(184,134,11,.09);
+  font-weight: normal;
+  text-align: left;
+  white-space: nowrap;
+}
+table.nft td { font-style: italic; color: var(--ink); }
+table.nft tr:nth-child(even) td { background: rgba(184,134,11,.05); }
+
+/* ── Sections ── */
+.section { margin-bottom: 20px; }
+.section-title {
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  font-size: .88rem;
+  color: var(--red);
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.section-title::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: linear-gradient(to right, var(--line), transparent);
+}
+
+.note {
+  font-family: 'IM Fell English SC', serif;
+  font-size: .71rem;
+  color: var(--faded);
+  letter-spacing: .04em;
+  margin-top: 4px;
+}
+.verb-note {
+  border-left: 2px solid var(--gold);
+  padding-left: 11px;
+  margin-top: 12px;
+  font-size: .79rem;
+  line-height: 1.55;
+}
+.warn-note {
+  color: var(--red);
+  font-size: .74rem;
+  margin-bottom: 7px;
+  font-family: 'IM Fell English SC', serif;
+  letter-spacing: .04em;
+}
+.footer-note { text-align: center; }
+
+/* ── Prepositions ── */
+.prep-section-title {
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  font-size: 1rem;
+  color: var(--red);
+  letter-spacing: .16em;
+  text-align: center;
+  margin: 20px 0 12px;
+}
+table.prept {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .83rem;
+  margin-bottom: 22px;
+}
+table.prept th,
+table.prept td {
+  border: 1px solid var(--line);
+  padding: 7px 10px;
+}
+table.prept thead th {
+  font-family: 'Cinzel', serif;
+  font-weight: 600;
+  font-size: .72rem;
+  letter-spacing: .08em;
+  color: var(--parchment);
+  background: var(--prep-head);
+}
+table.prept tbody tr th {
+  font-family: 'IM Fell English SC', serif;
+  font-size: .78rem;
+  color: var(--ink);
+  background: rgba(184,134,11,.09);
+  font-weight: normal;
+  text-align: left;
+}
+table.prept td.case-badge {
+  font-family: 'IM Fell English SC', serif;
+  color: var(--red);
+  font-style: normal;
+  font-size: .8rem;
+  text-align: center;
+  white-space: nowrap;
+  background: rgba(139,26,26,.05);
+}
+table.prept td.meaning { color: var(--ink); font-style: italic; }
+table.prept td.notes   { color: var(--faded); font-size: .78rem; }
+table.prept tbody tr:hover td,
+table.prept tbody tr:hover th { background: rgba(139,26,26,.07); }
+
+.case-gd { color: #6a2222; }
+.case-dt { color: #1a3a1a; }
+.case-ac { color: #1a1a4a; }
+
+/* ── Voice-only label ── */
+.voice-only-label {
+  font-family: 'IM Fell English SC', serif;
+  font-size: .72rem;
+  color: var(--faded);
+  letter-spacing: .1em;
+}
+
+/* ── Responsive ── */
+@media (max-width: 800px) {
+  .page       { padding: 26px 12px 34px; }
+  h1          { font-size: 1.45rem; }
+  .nf-grid    { grid-template-columns: 1fr; }
+  .verb-tab   { font-size: .68rem; padding: 4px 8px; }
+  table.ct    { font-size: .72rem; }
+  .nav-row    { flex-direction: column; align-items: flex-start; }
+}

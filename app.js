@@ -1,0 +1,784 @@
+/* ═══════════════════════════════════════════════════════════════
+   Ῥήματα Ἑλληνικά — app.js
+   ═══════════════════════════════════════════════════════════════ */
+
+// ─── HELPERS ────────────────────────────────────────────────────
+const P6   = ['1sg','2sg','3sg','1pl','2pl','3pl'];
+const IMP4 = ['2sg','3sg','2pl','3pl'];
+
+function vc(head) {
+  if (head === 'act')  return 'h-act';
+  if (head === 'mid')  return 'h-mid';
+  if (head === 'pass') return 'h-pass';
+  return 'h-imp';
+}
+function vcLabel(h) {
+  return h === 'act' ? 'Active' : h === 'mid' ? 'Middle' : 'Passive';
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  VERB DATA
+// ═══════════════════════════════════════════════════════════════
+const V = [
+
+// ─── 0. λύω ───────────────────────────────────────────────────
+{id:'luo',title:'λύω',pp:'λύω, λύσω, ἔλυσα, λέλυκα, λέλυμαι, ἐλύθην',mean:'to loose, release, destroy',grp:'Regular ω-Verb',voices:['act','mid','pass'],
+ind:{
+  act:{
+    pres:['λύω','λύεις','λύει','λύομεν','λύετε','λύουσι(ν)'],
+    impf:['ἔλυον','ἔλυες','ἔλυε(ν)','ἐλύομεν','ἐλύετε','ἔλυον'],
+    fut: ['λύσω','λύσεις','λύσει','λύσομεν','λύσετε','λύσουσι(ν)'],
+    aor: ['ἔλυσα','ἔλυσας','ἔλυσε(ν)','ἐλύσαμεν','ἐλύσατε','ἔλυσαν'],
+    perf:['λέλυκα','λέλυκας','λέλυκε(ν)','λελύκαμεν','λελύκατε','λελύκασι(ν)'],
+    plpf:['ἐλελύκη','ἐλελύκης','ἐλελύκει','ἐλελύκεμεν','ἐλελύκετε','ἐλελύκεσαν']},
+  mid:{
+    pres:['λύομαι','λύῃ','λύεται','λυόμεθα','λύεσθε','λύονται'],
+    impf:['ἐλυόμην','ἐλύου','ἐλύετο','ἐλυόμεθα','ἐλύεσθε','ἐλύοντο'],
+    futmid:['λύσομαι','λύσῃ','λύσεται','λυσόμεθα','λύσεσθε','λύσονται'],
+    aormid:['ἐλυσάμην','ἐλύσω','ἐλύσατο','ἐλυσάμεθα','ἐλύσασθε','ἐλύσαντο']},
+  pass:{
+    futpass:['λυθήσομαι','λυθήσῃ','λυθήσεται','λυθησόμεθα','λυθήσεσθε','λυθήσονται'],
+    aorpass:['ἐλύθην','ἐλύθης','ἐλύθη','ἐλύθημεν','ἐλύθητε','ἐλύθησαν'],
+    perfpass:['λέλυμαι','λέλυσαι','λέλυται','λελύμεθα','λέλυσθε','λέλυνται'],
+    plpfpass:['ἐλελύμην','ἐλέλυσο','ἐλέλυτο','ἐλελύμεθα','ἐλέλυσθε','ἐλέλυντο']}},
+subj:{
+  act:{pres:['λύω','λύῃς','λύῃ','λύωμεν','λύητε','λύωσι(ν)'],
+       aor: ['λύσω','λύσῃς','λύσῃ','λύσωμεν','λύσητε','λύσωσι(ν)']},
+  mid:{pres:['λύωμαι','λύῃ','λύηται','λυώμεθα','λύησθε','λύωνται'],
+       aormid:['λύσωμαι','λύσῃ','λύσηται','λυσώμεθα','λύσησθε','λύσωνται']},
+  pass:{aorpass:['λυθῶ','λυθῇς','λυθῇ','λυθῶμεν','λυθῆτε','λυθῶσι(ν)']}},
+opt:{
+  act:{pres:['λύοιμι','λύοις','λύοι','λύοιμεν','λύοιτε','λύοιεν'],
+       fut: ['λύσοιμι','λύσοις','λύσοι','λύσοιμεν','λύσοιτε','λύσοιεν'],
+       aor: ['λύσαιμι','λύσαις','λύσαι','λύσαιμεν','λύσαιτε','λύσαιεν']},
+  mid:{pres:['λυοίμην','λύοιο','λύοιτο','λυοίμεθα','λύοισθε','λύοιντο'],
+       futmid:['λυσοίμην','λύσοιο','λύσοιτο','λυσοίμεθα','λύσοισθε','λύσοιντο'],
+       aormid:['λυσαίμην','λύσαιο','λύσαιτο','λυσαίμεθα','λύσαισθε','λύσαιντο']},
+  pass:{futpass:['λυθησοίμην','λυθήσοιο','λυθήσοιτο','λυθησοίμεθα','λυθήσοισθε','λυθήσοιντο'],
+        aorpass:['λυθείην','λυθείης','λυθείη','λυθείημεν','λυθείητε','λυθείησαν']}},
+imp:{
+  act:{pres:['λῦε','λυέτω','λύετε','λυόντων'],aor:['λῦσον','λυσάτω','λύσατε','λυσάντων'],perf:['λέλυκε','λελυκέτω','λελύκετε','λελυκόντων']},
+  mid:{pres:['λύου','λυέσθω','λύεσθε','λυέσθων'],aormid:['λῦσαι','λυσάσθω','λύσασθε','λυσάσθων']},
+  pass:{aorpass:['λύθητι','λυθήτω','λύθητε','λυθέντων']}},
+inf:[['Pres. Act.','λύειν'],['Fut. Act.','λύσειν'],['Aor. Act.','λῦσαι'],['Perf. Act.','λελυκέναι'],
+     ['Pres. Mid./Pass.','λύεσθαι'],['Fut. Mid.','λύσεσθαι'],['Aor. Mid.','λύσασθαι'],
+     ['Fut. Pass.','λυθήσεσθαι'],['Aor. Pass.','λυθῆναι'],['Perf. Mid./Pass.','λελύσθαι']],
+ptc:[['Pres. Act.','λύων, λύουσα, λῦον (gen: λύοντος)'],
+     ['Fut. Act.','λύσων, λύσουσα, λῦσον'],
+     ['Aor. Act.','λύσας, λύσασα, λῦσαν'],
+     ['Perf. Act.','λελυκώς, λελυκυῖα, λελυκός'],
+     ['Pres. Mid./Pass.','λυόμενος, -η, -ον'],
+     ['Fut. Mid.','λυσόμενος, -η, -ον'],
+     ['Aor. Mid.','λυσάμενος, -η, -ον'],
+     ['Fut. Pass.','λυθησόμενος, -η, -ον'],
+     ['Aor. Pass.','λυθείς, λυθεῖσα, λυθέν'],
+     ['Perf. Mid./Pass.','λελυμένος, -η, -ον']],
+note:'λύω is the standard paradigm verb for Attic Greek ω-conjugation. Note that the Present and Imperfect Passive are identical in form to the Present and Imperfect Middle — context or lexical meaning distinguishes them. The Aorist Passive is distinctive (ἐ- + stem + -θη-) and uses active endings. The Perfect Passive uses the reduplication + perfect middle endings.'},
+
+// ─── 1. φιλέω ─────────────────────────────────────────────────
+{id:'phileo',title:'φιλέω',pp:'φιλέω, φιλήσω, ἐφίλησα, πεφίληκα, πεφίλημαι, ἐφιλήθην',mean:'to love, like, be fond of',grp:'ε-Contract Verb',voices:['act','mid','pass'],
+contractNote:'Only the Present system (Pres. Ind., Impf., Subj., Opt., Imp., Inf., Ptc.) shows ε-contraction. The Future, Aorist, and Perfect forms are built on the lengthened stem φιλη- and follow the regular λύω pattern.',
+ind:{
+  act:{
+    pres:['φιλῶ','φιλεῖς','φιλεῖ','φιλοῦμεν','φιλεῖτε','φιλοῦσι(ν)'],
+    impf:['ἐφίλουν','ἐφίλεις','ἐφίλει','ἐφιλοῦμεν','ἐφιλεῖτε','ἐφίλουν'],
+    fut: ['φιλήσω','φιλήσεις','φιλήσει','φιλήσομεν','φιλήσετε','φιλήσουσι(ν)'],
+    aor: ['ἐφίλησα','ἐφίλησας','ἐφίλησε(ν)','ἐφιλήσαμεν','ἐφιλήσατε','ἐφίλησαν'],
+    perf:['πεφίληκα','πεφίληκας','πεφίληκε(ν)','πεφιλήκαμεν','πεφιλήκατε','πεφιλήκασι(ν)'],
+    plpf:['ἐπεφιλήκη','ἐπεφιλήκης','ἐπεφιλήκει','ἐπεφιλήκεμεν','ἐπεφιλήκετε','ἐπεφιλήκεσαν']},
+  mid:{
+    pres:['φιλοῦμαι','φιλῇ','φιλεῖται','φιλούμεθα','φιλεῖσθε','φιλοῦνται'],
+    impf:['ἐφιλούμην','ἐφιλοῦ','ἐφιλεῖτο','ἐφιλούμεθα','ἐφιλεῖσθε','ἐφιλοῦντο'],
+    futmid:['φιλήσομαι','φιλήσῃ','φιλήσεται','φιλησόμεθα','φιλήσεσθε','φιλήσονται'],
+    aormid:['ἐφιλησάμην','ἐφιλήσω','ἐφιλήσατο','ἐφιλησάμεθα','ἐφιλήσασθε','ἐφιλήσαντο']},
+  pass:{
+    futpass:['φιληθήσομαι','φιληθήσῃ','φιληθήσεται','φιληθησόμεθα','φιληθήσεσθε','φιληθήσονται'],
+    aorpass:['ἐφιλήθην','ἐφιλήθης','ἐφιλήθη','ἐφιλήθημεν','ἐφιλήθητε','ἐφιλήθησαν'],
+    perfpass:['πεφίλημαι','πεφίλησαι','πεφίληται','πεφιλήμεθα','πεφίλησθε','πεφίληνται'],
+    plpfpass:['ἐπεφιλήμην','ἐπεφίλησο','ἐπεφίλητο','ἐπεφιλήμεθα','ἐπεφίλησθε','ἐπεφίληντο']}},
+subj:{
+  act:{pres:['φιλῶ','φιλῇς','φιλῇ','φιλῶμεν','φιλῆτε','φιλῶσι(ν)'],
+       aor: ['φιλήσω','φιλήσῃς','φιλήσῃ','φιλήσωμεν','φιλήσητε','φιλήσωσι(ν)']},
+  mid:{pres:['φιλῶμαι','φιλῇ','φιλῆται','φιλώμεθα','φιλῆσθε','φιλῶνται'],
+       aormid:['φιλήσωμαι','φιλήσῃ','φιλήσηται','φιλησώμεθα','φιλήσησθε','φιλήσωνται']},
+  pass:{aorpass:['φιληθῶ','φιληθῇς','φιληθῇ','φιληθῶμεν','φιληθῆτε','φιληθῶσι(ν)']}},
+opt:{
+  act:{pres:['φιλοῖμι','φιλοῖς','φιλοῖ','φιλοῖμεν','φιλοῖτε','φιλοῖεν'],
+       fut: ['φιλήσοιμι','φιλήσοις','φιλήσοι','φιλήσοιμεν','φιλήσοιτε','φιλήσοιεν'],
+       aor: ['φιλήσαιμι','φιλήσαις','φιλήσαι','φιλήσαιμεν','φιλήσαιτε','φιλήσαιεν']},
+  mid:{pres:['φιλοίμην','φιλοῖο','φιλοῖτο','φιλοίμεθα','φιλοῖσθε','φιλοῖντο'],
+       futmid:['φιλησοίμην','φιλήσοιο','φιλήσοιτο','φιλησοίμεθα','φιλήσοισθε','φιλήσοιντο'],
+       aormid:['φιλησαίμην','φιλήσαιο','φιλήσαιτο','φιλησαίμεθα','φιλήσαισθε','φιλήσαιντο']},
+  pass:{futpass:['φιληθησοίμην','φιληθήσοιο','φιληθήσοιτο','φιληθησοίμεθα','φιληθήσοισθε','φιληθήσοιντο'],
+        aorpass:['φιληθείην','φιληθείης','φιληθείη','φιληθείημεν','φιληθείητε','φιληθείησαν']}},
+imp:{
+  act:{pres:['φίλει','φιλείτω','φιλεῖτε','φιλούντων'],aor:['φίλησον','φιλησάτω','φιλήσατε','φιλησάντων']},
+  mid:{pres:['φιλοῦ','φιλείσθω','φιλεῖσθε','φιλείσθων'],aormid:['φίλησαι','φιλησάσθω','φιλήσασθε','φιλησάσθων']},
+  pass:{aorpass:['φιλήθητι','φιληθήτω','φιλήθητε','φιληθέντων']}},
+inf:[['Pres. Act.','φιλεῖν'],['Fut. Act.','φιλήσειν'],['Aor. Act.','φιλῆσαι'],
+     ['Pres. Mid./Pass.','φιλεῖσθαι'],['Aor. Mid.','φιλήσασθαι'],
+     ['Aor. Pass.','φιληθῆναι'],['Perf. Act.','πεφιληκέναι'],['Perf. Mid./Pass.','πεφιλῆσθαι']],
+ptc:[['Pres. Act.','φιλῶν, φιλοῦσα, φιλοῦν'],['Aor. Act.','φιλήσας, -ασα, -αν'],
+     ['Perf. Act.','πεφιληκώς, -υῖα, -ός'],['Pres. Mid./Pass.','φιλούμενος, -η, -ον'],
+     ['Aor. Pass.','φιληθείς, -εῖσα, -έν']],
+note:'ε-contract verbs contract ε + vowel: ε+ε=ει, ε+ο=ου, ε+ω=ω, ε+η=η, ε+ει=ει, ε+οι=οι, ε+ου=ου. The contracted present forms look like 3rd-declension adjective participles. The pres. subj. active (φιλῶ, φιλῇς…) is distinguished from the pres. indic. only by the subjunctive mood context.'},
+
+// ─── 2. τιμάω ─────────────────────────────────────────────────
+{id:'timao',title:'τιμάω',pp:'τιμάω, τιμήσω, ἐτίμησα, τετίμηκα, τετίμημαι, ἐτιμήθην',mean:'to honor, hold in honor',grp:'α-Contract Verb',voices:['act','mid','pass'],
+contractNote:'Only the Present system shows α-contraction. The Future, Aorist, and Perfect use the lengthened stem τιμη- and follow the regular pattern.',
+ind:{
+  act:{
+    pres:['τιμῶ','τιμᾷς','τιμᾷ','τιμῶμεν','τιμᾶτε','τιμῶσι(ν)'],
+    impf:['ἐτίμων','ἐτίμας','ἐτίμα','ἐτιμῶμεν','ἐτιμᾶτε','ἐτίμων'],
+    fut: ['τιμήσω','τιμήσεις','τιμήσει','τιμήσομεν','τιμήσετε','τιμήσουσι(ν)'],
+    aor: ['ἐτίμησα','ἐτίμησας','ἐτίμησε(ν)','ἐτιμήσαμεν','ἐτιμήσατε','ἐτίμησαν'],
+    perf:['τετίμηκα','τετίμηκας','τετίμηκε(ν)','τετιμήκαμεν','τετιμήκατε','τετιμήκασι(ν)'],
+    plpf:['ἐτετιμήκη','ἐτετιμήκης','ἐτετιμήκει','ἐτετιμήκεμεν','ἐτετιμήκετε','ἐτετιμήκεσαν']},
+  mid:{
+    pres:['τιμῶμαι','τιμᾷ','τιμᾶται','τιμώμεθα','τιμᾶσθε','τιμῶνται'],
+    impf:['ἐτιμώμην','ἐτιμῶ','ἐτιμᾶτο','ἐτιμώμεθα','ἐτιμᾶσθε','ἐτιμῶντο'],
+    futmid:['τιμήσομαι','τιμήσῃ','τιμήσεται','τιμησόμεθα','τιμήσεσθε','τιμήσονται'],
+    aormid:['ἐτιμησάμην','ἐτιμήσω','ἐτιμήσατο','ἐτιμησάμεθα','ἐτιμήσασθε','ἐτιμήσαντο']},
+  pass:{
+    futpass:['τιμηθήσομαι','τιμηθήσῃ','τιμηθήσεται','τιμηθησόμεθα','τιμηθήσεσθε','τιμηθήσονται'],
+    aorpass:['ἐτιμήθην','ἐτιμήθης','ἐτιμήθη','ἐτιμήθημεν','ἐτιμήθητε','ἐτιμήθησαν'],
+    perfpass:['τετίμημαι','τετίμησαι','τετίμηται','τετιμήμεθα','τετίμησθε','τετίμηνται'],
+    plpfpass:['ἐτετιμήμην','ἐτετίμησο','ἐτετίμητο','ἐτετιμήμεθα','ἐτετίμησθε','ἐτετίμηντο']}},
+subj:{
+  act:{pres:['τιμῶ','τιμᾷς','τιμᾷ','τιμῶμεν','τιμᾶτε','τιμῶσι(ν)'],
+       aor: ['τιμήσω','τιμήσῃς','τιμήσῃ','τιμήσωμεν','τιμήσητε','τιμήσωσι(ν)']},
+  mid:{pres:['τιμῶμαι','τιμᾷ','τιμᾶται','τιμώμεθα','τιμᾶσθε','τιμῶνται'],
+       aormid:['τιμήσωμαι','τιμήσῃ','τιμήσηται','τιμησώμεθα','τιμήσησθε','τιμήσωνται']},
+  pass:{aorpass:['τιμηθῶ','τιμηθῇς','τιμηθῇ','τιμηθῶμεν','τιμηθῆτε','τιμηθῶσι(ν)']}},
+opt:{
+  act:{pres:['τιμῷμι','τιμῷς','τιμῷ','τιμῷμεν','τιμῷτε','τιμῷεν'],
+       fut: ['τιμήσοιμι','τιμήσοις','τιμήσοι','τιμήσοιμεν','τιμήσοιτε','τιμήσοιεν'],
+       aor: ['τιμήσαιμι','τιμήσαις','τιμήσαι','τιμήσαιμεν','τιμήσαιτε','τιμήσαιεν']},
+  mid:{pres:['τιμῴμην','τιμῷο','τιμῷτο','τιμῴμεθα','τιμῷσθε','τιμῷντο'],
+       futmid:['τιμησοίμην','τιμήσοιο','τιμήσοιτο','τιμησοίμεθα','τιμήσοισθε','τιμήσοιντο'],
+       aormid:['τιμησαίμην','τιμήσαιο','τιμήσαιτο','τιμησαίμεθα','τιμήσαισθε','τιμήσαιντο']},
+  pass:{futpass:['τιμηθησοίμην','τιμηθήσοιο','τιμηθήσοιτο','τιμηθησοίμεθα','τιμηθήσοισθε','τιμηθήσοιντο'],
+        aorpass:['τιμηθείην','τιμηθείης','τιμηθείη','τιμηθείημεν','τιμηθείητε','τιμηθείησαν']}},
+imp:{
+  act:{pres:['τίμα','τιμάτω','τιμᾶτε','τιμώντων'],aor:['τίμησον','τιμησάτω','τιμήσατε','τιμησάντων']},
+  mid:{pres:['τιμῶ','τιμάσθω','τιμᾶσθε','τιμάσθων'],aormid:['τίμησαι','τιμησάσθω','τιμήσασθε','τιμησάσθων']},
+  pass:{aorpass:['τιμήθητι','τιμηθήτω','τιμήθητε','τιμηθέντων']}},
+inf:[['Pres. Act.','τιμᾶν'],['Aor. Act.','τιμῆσαι'],['Pres. Mid./Pass.','τιμᾶσθαι'],['Aor. Pass.','τιμηθῆναι']],
+ptc:[['Pres. Act.','τιμῶν, τιμῶσα, τιμῶν'],['Pres. Mid./Pass.','τιμώμενος, -η, -ον'],['Aor. Pass.','τιμηθείς, -εῖσα, -έν']],
+note:'α-contract rules: α+ε=ᾱ, α+ει=ᾳ, α+η=ᾱ, α+ῃ=ᾳ, α+ο=ω, α+οι=ῳ, α+ου=ω, α+ω=ω. NB: The Present Subjunctive Active (τιμῶ, τιμᾷς…) is identical in form to the Present Indicative Active because the α-contract long vowels are already of subjunctive length.'},
+
+// ─── 3. δηλόω ─────────────────────────────────────────────────
+{id:'deloo',title:'δηλόω',pp:'δηλόω, δηλώσω, ἐδήλωσα, δεδήλωκα, δεδήλωμαι, ἐδηλώθην',mean:'to make clear, show, reveal',grp:'ο-Contract Verb',voices:['act','mid','pass'],
+contractNote:'Only the Present system shows ο-contraction. The Future and beyond use lengthened stem δηλω- and follow the regular pattern.',
+ind:{
+  act:{
+    pres:['δηλῶ','δηλοῖς','δηλοῖ','δηλοῦμεν','δηλοῦτε','δηλοῦσι(ν)'],
+    impf:['ἐδήλουν','ἐδήλους','ἐδήλου','ἐδηλοῦμεν','ἐδηλοῦτε','ἐδήλουν'],
+    fut: ['δηλώσω','δηλώσεις','δηλώσει','δηλώσομεν','δηλώσετε','δηλώσουσι(ν)'],
+    aor: ['ἐδήλωσα','ἐδήλωσας','ἐδήλωσε(ν)','ἐδηλώσαμεν','ἐδηλώσατε','ἐδήλωσαν'],
+    perf:['δεδήλωκα','δεδήλωκας','δεδήλωκε(ν)','δεδηλώκαμεν','δεδηλώκατε','δεδηλώκασι(ν)'],
+    plpf:['ἐδεδηλώκη','ἐδεδηλώκης','ἐδεδηλώκει','ἐδεδηλώκεμεν','ἐδεδηλώκετε','ἐδεδηλώκεσαν']},
+  mid:{
+    pres:['δηλοῦμαι','δηλοῖ','δηλοῦται','δηλούμεθα','δηλοῦσθε','δηλοῦνται'],
+    impf:['ἐδηλούμην','ἐδηλοῦ','ἐδηλοῦτο','ἐδηλούμεθα','ἐδηλοῦσθε','ἐδηλοῦντο'],
+    futmid:['δηλώσομαι','δηλώσῃ','δηλώσεται','δηλωσόμεθα','δηλώσεσθε','δηλώσονται'],
+    aormid:['ἐδηλωσάμην','ἐδηλώσω','ἐδηλώσατο','ἐδηλωσάμεθα','ἐδηλώσασθε','ἐδηλώσαντο']},
+  pass:{
+    futpass:['δηλωθήσομαι','δηλωθήσῃ','δηλωθήσεται','δηλωθησόμεθα','δηλωθήσεσθε','δηλωθήσονται'],
+    aorpass:['ἐδηλώθην','ἐδηλώθης','ἐδηλώθη','ἐδηλώθημεν','ἐδηλώθητε','ἐδηλώθησαν'],
+    perfpass:['δεδήλωμαι','δεδήλωσαι','δεδήλωται','δεδηλώμεθα','δεδήλωσθε','δεδήλωνται'],
+    plpfpass:['ἐδεδηλώμην','ἐδεδήλωσο','ἐδεδήλωτο','ἐδεδηλώμεθα','ἐδεδήλωσθε','ἐδεδήλωντο']}},
+subj:{
+  act:{pres:['δηλῶ','δηλοῖς','δηλοῖ','δηλῶμεν','δηλῶτε','δηλῶσι(ν)'],
+       aor: ['δηλώσω','δηλώσῃς','δηλώσῃ','δηλώσωμεν','δηλώσητε','δηλώσωσι(ν)']},
+  mid:{pres:['δηλῶμαι','δηλοῖ','δηλῶται','δηλώμεθα','δηλῶσθε','δηλῶνται'],
+       aormid:['δηλώσωμαι','δηλώσῃ','δηλώσηται','δηλωσώμεθα','δηλώσησθε','δηλώσωνται']},
+  pass:{aorpass:['δηλωθῶ','δηλωθῇς','δηλωθῇ','δηλωθῶμεν','δηλωθῆτε','δηλωθῶσι(ν)']}},
+opt:{
+  act:{pres:['δηλοῖμι','δηλοῖς','δηλοῖ','δηλοῖμεν','δηλοῖτε','δηλοῖεν'],
+       fut: ['δηλώσοιμι','δηλώσοις','δηλώσοι','δηλώσοιμεν','δηλώσοιτε','δηλώσοιεν'],
+       aor: ['δηλώσαιμι','δηλώσαις','δηλώσαι','δηλώσαιμεν','δηλώσαιτε','δηλώσαιεν']},
+  mid:{pres:['δηλοίμην','δηλοῖο','δηλοῖτο','δηλοίμεθα','δηλοῖσθε','δηλοῖντο'],
+       futmid:['δηλωσοίμην','δηλώσοιο','δηλώσοιτο','δηλωσοίμεθα','δηλώσοισθε','δηλώσοιντο'],
+       aormid:['δηλωσαίμην','δηλώσαιο','δηλώσαιτο','δηλωσαίμεθα','δηλώσαισθε','δηλώσαιντο']},
+  pass:{futpass:['δηλωθησοίμην','δηλωθήσοιο','δηλωθήσοιτο','δηλωθησοίμεθα','δηλωθήσοισθε','δηλωθήσοιντο'],
+        aorpass:['δηλωθείην','δηλωθείης','δηλωθείη','δηλωθείημεν','δηλωθείητε','δηλωθείησαν']}},
+imp:{
+  act:{pres:['δήλου','δηλούτω','δηλοῦτε','δηλούντων'],aor:['δήλωσον','δηλωσάτω','δηλώσατε','δηλωσάντων']},
+  mid:{pres:['δηλοῦ','δηλούσθω','δηλοῦσθε','δηλούσθων'],aormid:['δήλωσαι','δηλωσάσθω','δηλώσασθε','δηλωσάσθων']},
+  pass:{aorpass:['δηλώθητι','δηλωθήτω','δηλώθητε','δηλωθέντων']}},
+inf:[['Pres. Act.','δηλοῦν'],['Aor. Act.','δηλῶσαι'],['Pres. Mid./Pass.','δηλοῦσθαι'],['Aor. Pass.','δηλωθῆναι']],
+ptc:[['Pres. Act.','δηλῶν, δηλοῦσα, δηλοῦν'],['Pres. Mid./Pass.','δηλούμενος, -η, -ον'],['Aor. Pass.','δηλωθείς, -εῖσα, -έν']],
+note:'ο-contract rules: ο+ε=ου, ο+ει=οι, ο+η=ω, ο+ο=ου, ο+οι=οι, ο+ω=ω. The ο-contract present optative (δηλοῖμι…) is identical in form to the ε-contract, since both produce -οι- from their respective contractions.'},
+
+// ─── 4. εἰμί ──────────────────────────────────────────────────
+{id:'eimi',title:'εἰμί',pp:'εἰμί, ἔσομαι, —',mean:'to be, exist',grp:'Irregular (Defective)',voices:['act'],
+ind:{
+  act:{
+    pres:['εἰμί','εἶ','ἐστί(ν)','ἐσμέν','ἐστέ','εἰσί(ν)'],
+    impf:['ἦν','ἦσθα','ἦν','ἦμεν','ἦτε','ἦσαν'],
+    fut: ['ἔσομαι','ἔσῃ / ἔσει','ἔσται','ἐσόμεθα','ἔσεσθε','ἔσονται'],
+    aor: null, perf: null, plpf: null},
+  mid:null, pass:null},
+subj:{
+  act:{pres:['ὦ','ᾖς','ᾖ','ὦμεν','ἦτε','ὦσι(ν)'], aor:null},
+  mid:null, pass:null},
+opt:{
+  act:{pres:['εἴην','εἴης','εἴη','εἴημεν / εἶμεν','εἴητε / εἶτε','εἴησαν / εἶεν'],
+       fut: ['ἐσοίμην','ἔσοιο','ἔσοιτο','ἐσοίμεθα','ἔσοισθε','ἔσοιντο'], aor:null},
+  mid:null, pass:null},
+imp:{
+  act:{pres:['ἴσθι','ἔστω / ἤτω','ἔστε','ἔστων / ὄντων'], aor:null},
+  mid:null, pass:null},
+inf:[['Pres.','εἶναι'],['Fut.','ἔσεσθαι']],
+ptc:[['Pres. (all genders)','ὤν, οὖσα, ὄν (gen: ὄντος)'],['Fut.','ἐσόμενος, -η, -ον']],
+note:'εἰμί is defective: it has no aorist, no perfect, no passive, no middle (except future), and no imperative in most authors beyond the present. Most forms are enclitic when not sentence-initial except εἶ (2sg) and the subjunctive. The future ἔσομαι uses middle endings. The imperfect is the past of "being."'},
+
+// ─── 5. φημί ──────────────────────────────────────────────────
+{id:'phemi',title:'φημί',pp:'φημί, φήσω, ἔφησα',mean:'to say, assert, claim',grp:'Irregular μι-verb',voices:['act'],
+ind:{
+  act:{
+    pres:['φημί','φῄς','φησί(ν)','φαμέν','φατέ','φασί(ν)'],
+    impf:['ἔφην','ἔφησθα / ἔφης','ἔφη','ἔφαμεν','ἔφατε','ἔφασαν'],
+    fut: ['φήσω','φήσεις','φήσει','φήσομεν','φήσετε','φήσουσι(ν)'],
+    aor: ['ἔφησα','ἔφησας','ἔφησε(ν)','ἐφήσαμεν','ἐφήσατε','ἔφησαν'],
+    perf:null, plpf:null},
+  mid:null, pass:null},
+subj:{
+  act:{pres:['φῶ','φῇς','φῇ','φῶμεν','φῆτε','φῶσι(ν)'], aor:null},
+  mid:null, pass:null},
+opt:{
+  act:{pres:['φαίην','φαίης','φαίη','φαῖμεν','φαῖτε','φαῖεν'], fut:null, aor:null},
+  mid:null, pass:null},
+imp:{
+  act:{pres:['φαθί / φάθι','φάτω','φάτε','φάντων'], aor:null},
+  mid:null, pass:null},
+inf:[['Pres.','φάναι']],
+ptc:[['Pres.','φάς, φᾶσα, φάν (gen: φάντος)']],
+note:'φημί is mostly used in 3rd person singular (φησί) to introduce indirect statements. In Attic prose, the imperfect ἔφη (3sg) and ἔφασαν (3pl) are the most frequent forms, used in historical narrative to report speech. Most of its paradigm outside the present/imperfect is rare in classical prose.'},
+
+// ─── 6. εἶμι ──────────────────────────────────────────────────
+{id:'eimi2',title:'εἶμι',pp:'εἶμι, — (supplies future of ἔρχομαι in Attic)',mean:'to go (will go — future in Attic prose)',grp:'Irregular μι-verb',voices:['act'],
+ind:{
+  act:{
+    pres:['εἶμι','εἶ','εἶσι(ν)','ἴμεν','ἴτε','ἴᾱσι(ν)'],
+    impf:['ᾔειν','ᾔεις','ᾔει','ᾖμεν','ᾖτε','ᾖσαν / ᾔεσαν'],
+    fut: null, aor: null, perf: null, plpf: null},
+  mid:null, pass:null},
+subj:{
+  act:{pres:['ἴω','ἴῃς','ἴῃ','ἴωμεν','ἴητε','ἴωσι(ν)'], aor:null},
+  mid:null, pass:null},
+opt:{
+  act:{pres:['ἴοιμι','ἴοις','ἴοι','ἴοιμεν','ἴοιτε','ἴοιεν'], fut:null, aor:null},
+  mid:null, pass:null},
+imp:{
+  act:{pres:['ἴθι','ἴτω','ἴτε','ἰόντων'], aor:null},
+  mid:null, pass:null},
+inf:[['Pres. (= Fut. in sense)','ἰέναι']],
+ptc:[['Pres.','ἰών, ἰοῦσα, ἰόν (gen: ἰόντος)']],
+note:'In Attic prose εἶμι functions as the future of ἔρχομαι (to come/go). The present indicative has future meaning; the imperfect is used as a simple past (was going, went). The present subjunctive and optative are used in secondary sequence. Compound forms (εἴσειμι, ἔξειμι, etc.) are common. The imperative ἴθι ("go!") is very frequent.'},
+
+// ─── 7. οἶδα ──────────────────────────────────────────────────
+{id:'oida',title:'οἶδα',pp:'οἶδα (perf.), εἴσομαι (fut.), ᾔδη (plpf.)',mean:'to know (by having seen)',grp:'Irregular (Perfect as Present)',voices:['act'],
+ind:{
+  act:{
+    pres:['οἶδα','οἶσθα','οἶδε(ν)','ἴσμεν','ἴστε','ἴσᾱσι(ν)'],
+    impf:['ᾔδη','ᾔδης','ᾔδει(ν)','ᾔδεμεν','ᾔδετε','ᾔδεσαν'],
+    fut: ['εἴσομαι','εἴσῃ / εἴσει','εἴσεται','εἰσόμεθα','εἴσεσθε','εἴσονται'],
+    aor: null, perf: null, plpf: null},
+  mid:null, pass:null},
+subj:{
+  act:{pres:['εἰδῶ','εἰδῇς','εἰδῇ','εἰδῶμεν','εἰδῆτε','εἰδῶσι(ν)'], aor:null},
+  mid:null, pass:null},
+opt:{
+  act:{pres:['εἰδείην','εἰδείης','εἰδείη','εἰδεῖμεν / εἰδείημεν','εἰδεῖτε / εἰδείητε','εἰδεῖεν / εἰδείησαν'], fut:null, aor:null},
+  mid:null, pass:null},
+imp:{
+  act:{pres:['ἴσθι','ἴστω','ἴστε','ἴστων'], aor:null},
+  mid:null, pass:null},
+inf:[['Pres. / Perf.','εἰδέναι'],['Fut.','εἴσεσθαι']],
+ptc:[['Pres. / Perf.','εἰδώς, εἰδυῖα, εἰδός (gen: εἰδότος)']],
+note:'οἶδα is a perfect tense in form (with reduplication *ϝοιδ-) but has present meaning: "I know" = "I have seen (and thus know)." The pluperfect ᾔδη has imperfect meaning: "I knew." The future εἴσομαι means "I will know / find out." The 2sg οἶσθα is an archaic perfect form. The imperative ἴσθι is shared with εἰμί—context determines which is meant.'},
+
+// ─── 8. δίδωμι ────────────────────────────────────────────────
+{id:'didomi',title:'δίδωμι',pp:'δίδωμι, δώσω, ἔδωκα, δέδωκα, δέδομαι, ἐδόθην',mean:'to give',grp:'ω-stem μι-verb',voices:['act','mid','pass'],
+ind:{
+  act:{
+    pres:['δίδωμι','δίδως','δίδωσι(ν)','δίδομεν','δίδοτε','διδόᾱσι(ν)'],
+    impf:['ἐδίδουν','ἐδίδους','ἐδίδου','ἐδίδομεν','ἐδίδοτε','ἐδίδοσαν'],
+    fut: ['δώσω','δώσεις','δώσει','δώσομεν','δώσετε','δώσουσι(ν)'],
+    aor: ['ἔδωκα','ἔδωκας','ἔδωκε(ν)','ἔδομεν','ἔδοτε','ἔδοσαν'],
+    perf:['δέδωκα','δέδωκας','δέδωκε(ν)','δεδώκαμεν','δεδώκατε','δεδώκασι(ν)'],
+    plpf:['ἐδεδώκη','ἐδεδώκης','ἐδεδώκει','ἐδεδώκεμεν','ἐδεδώκετε','ἐδεδώκεσαν']},
+  mid:{
+    pres:['δίδομαι','δίδοσαι','δίδοται','διδόμεθα','δίδοσθε','δίδονται'],
+    impf:['ἐδιδόμην','ἐδίδοσο','ἐδίδοτο','ἐδιδόμεθα','ἐδίδοσθε','ἐδίδοντο'],
+    futmid:['δώσομαι','δώσῃ','δώσεται','δωσόμεθα','δώσεσθε','δώσονται'],
+    aormid:['ἐδόμην','ἔδου','ἔδοτο','ἐδόμεθα','ἔδοσθε','ἔδοντο']},
+  pass:{
+    futpass:['δοθήσομαι','δοθήσῃ','δοθήσεται','δοθησόμεθα','δοθήσεσθε','δοθήσονται'],
+    aorpass:['ἐδόθην','ἐδόθης','ἐδόθη','ἐδόθημεν','ἐδόθητε','ἐδόθησαν'],
+    perfpass:['δέδομαι','δέδοσαι','δέδοται','δεδόμεθα','δέδοσθε','δέδονται'],
+    plpfpass:['ἐδεδόμην','ἐδέδοσο','ἐδέδοτο','ἐδεδόμεθα','ἐδέδοσθε','ἐδέδοντο']}},
+subj:{
+  act:{pres:['διδῶ','διδῷς','διδῷ','διδῶμεν','διδῶτε','διδῶσι(ν)'],
+       aor: ['δῶ','δῷς','δῷ','δῶμεν','δῶτε','δῶσι(ν)']},
+  mid:{pres:['διδῶμαι','διδῷ','διδῶται','διδώμεθα','διδῶσθε','διδῶνται'],
+       aormid:['δῶμαι','δῷ','δῶται','δώμεθα','δῶσθε','δῶνται']},
+  pass:{aorpass:['δοθῶ','δοθῇς','δοθῇ','δοθῶμεν','δοθῆτε','δοθῶσι(ν)']}},
+opt:{
+  act:{pres:['διδοίην','διδοίης','διδοίη','διδοῖμεν','διδοῖτε','διδοῖεν'],
+       fut: ['δώσοιμι','δώσοις','δώσοι','δώσοιμεν','δώσοιτε','δώσοιεν'],
+       aor: ['δοίην','δοίης','δοίη','δοῖμεν','δοῖτε','δοῖεν']},
+  mid:{pres:['διδοίμην','διδοῖο','διδοῖτο','διδοίμεθα','διδοῖσθε','διδοῖντο'],
+       futmid:['δωσοίμην','δώσοιο','δώσοιτο','δωσοίμεθα','δώσοισθε','δώσοιντο'],
+       aormid:['δοίμην','δοῖο','δοῖτο','δοίμεθα','δοῖσθε','δοῖντο']},
+  pass:{futpass:['δοθησοίμην','δοθήσοιο','δοθήσοιτο','δοθησοίμεθα','δοθήσοισθε','δοθήσοιντο'],
+        aorpass:['δοθείην','δοθείης','δοθείη','δοθείημεν','δοθείητε','δοθείησαν']}},
+imp:{
+  act:{pres:['δίδου','διδότω','δίδοτε','διδόντων'],aor:['δός','δότω','δότε','δόντων']},
+  mid:{pres:['δίδοσο','διδόσθω','δίδοσθε','διδόσθων'],aormid:['δοῦ','δόσθω','δόσθε','δόσθων']},
+  pass:{aorpass:['δόθητι','δοθήτω','δόθητε','δοθέντων']}},
+inf:[['Pres. Act.','διδόναι'],['Aor. Act.','δοῦναι'],['Perf. Act.','δεδωκέναι'],
+     ['Pres. Mid./Pass.','δίδοσθαι'],['Aor. Mid.','δόσθαι'],
+     ['Aor. Pass.','δοθῆναι'],['Fut. Act.','δώσειν'],['Perf. Pass.','δεδόσθαι']],
+ptc:[['Pres. Act.','διδούς, -οῦσα, -όν (gen: διδόντος)'],
+     ['Aor. Act.','δούς, -οῦσα, -όν (gen: δόντος)'],
+     ['Perf. Act.','δεδωκώς, -υῖα, -ός'],
+     ['Pres. Mid./Pass.','διδόμενος, -η, -ον'],
+     ['Aor. Mid.','δόμενος, -η, -ον'],
+     ['Aor. Pass.','δοθείς, δοθεῖσα, δοθέν']],
+note:'δίδωμι alternates between the long ω-stem (sg present/imperfect: δίδωμι, ἐδίδουν) and short ο-stem (pl present/imperfect: δίδομεν, ἐδίδοτε). The aorist is suppletive: ἔδωκα (1sg), but ἔδομεν, ἔδοτε, ἔδοσαν (pl). The aorist subjunctive δῶ, δῷς, δῷ uses the subjunctive mood sign lengthened from the short ο-stem.'},
+
+// ─── 9. τίθημι ────────────────────────────────────────────────
+{id:'tithemi',title:'τίθημι',pp:'τίθημι, θήσω, ἔθηκα, τέθηκα, τέθειμαι, ἐτέθην',mean:'to put, place, set, establish',grp:'ε-stem μι-verb',voices:['act','mid','pass'],
+ind:{
+  act:{
+    pres:['τίθημι','τίθης','τίθησι(ν)','τίθεμεν','τίθετε','τιθέᾱσι(ν)'],
+    impf:['ἐτίθην','ἐτίθης','ἐτίθει','ἐτίθεμεν','ἐτίθετε','ἐτίθεσαν'],
+    fut: ['θήσω','θήσεις','θήσει','θήσομεν','θήσετε','θήσουσι(ν)'],
+    aor: ['ἔθηκα','ἔθηκας','ἔθηκε(ν)','ἔθεμεν','ἔθετε','ἔθεσαν'],
+    perf:['τέθηκα','τέθηκας','τέθηκε(ν)','τεθήκαμεν','τεθήκατε','τεθήκασι(ν)'],
+    plpf:['ἐτεθήκη','ἐτεθήκης','ἐτεθήκει','ἐτεθήκεμεν','ἐτεθήκετε','ἐτεθήκεσαν']},
+  mid:{
+    pres:['τίθεμαι','τίθεσαι','τίθεται','τιθέμεθα','τίθεσθε','τίθενται'],
+    impf:['ἐτιθέμην','ἐτίθεσο','ἐτίθετο','ἐτιθέμεθα','ἐτίθεσθε','ἐτίθεντο'],
+    futmid:['θήσομαι','θήσῃ','θήσεται','θησόμεθα','θήσεσθε','θήσονται'],
+    aormid:['ἐθέμην','ἔθου','ἔθετο','ἐθέμεθα','ἔθεσθε','ἔθεντο']},
+  pass:{
+    futpass:['τεθήσομαι','τεθήσῃ','τεθήσεται','τεθησόμεθα','τεθήσεσθε','τεθήσονται'],
+    aorpass:['ἐτέθην','ἐτέθης','ἐτέθη','ἐτέθημεν','ἐτέθητε','ἐτέθησαν'],
+    perfpass:['τέθειμαι','τέθεισαι','τέθειται','τεθείμεθα','τέθεισθε','τέθεινται'],
+    plpfpass:['ἐτεθείμην','ἐτέθεισο','ἐτέθειτο','ἐτεθείμεθα','ἐτέθεισθε','ἐτέθειντο']}},
+subj:{
+  act:{pres:['τιθῶ','τιθῇς','τιθῇ','τιθῶμεν','τιθῆτε','τιθῶσι(ν)'],
+       aor: ['θῶ','θῇς','θῇ','θῶμεν','θῆτε','θῶσι(ν)']},
+  mid:{pres:['τιθῶμαι','τιθῇ','τιθῆται','τιθώμεθα','τιθῆσθε','τιθῶνται'],
+       aormid:['θῶμαι','θῇ','θῆται','θώμεθα','θῆσθε','θῶνται']},
+  pass:{aorpass:['τεθῶ','τεθῇς','τεθῇ','τεθῶμεν','τεθῆτε','τεθῶσι(ν)']}},
+opt:{
+  act:{pres:['τιθείην','τιθείης','τιθείη','τιθεῖμεν','τιθεῖτε','τιθεῖεν'],
+       fut: ['θήσοιμι','θήσοις','θήσοι','θήσοιμεν','θήσοιτε','θήσοιεν'],
+       aor: ['θείην','θείης','θείη','θεῖμεν','θεῖτε','θεῖεν']},
+  mid:{pres:['τιθείμην','τιθεῖο','τιθεῖτο','τιθείμεθα','τιθεῖσθε','τιθεῖντο'],
+       futmid:['θησοίμην','θήσοιο','θήσοιτο','θησοίμεθα','θήσοισθε','θήσοιντο'],
+       aormid:['θείμην','θεῖο','θεῖτο','θείμεθα','θεῖσθε','θεῖντο']},
+  pass:{futpass:['τεθησοίμην','τεθήσοιο','τεθήσοιτο','τεθησοίμεθα','τεθήσοισθε','τεθήσοιντο'],
+        aorpass:['τεθείην','τεθείης','τεθείη','τεθείημεν','τεθείητε','τεθείησαν']}},
+imp:{
+  act:{pres:['τίθει','τιθέτω','τίθετε','τιθέντων'],aor:['θές','θέτω','θέτε','θέντων']},
+  mid:{pres:['τίθεσο','τιθέσθω','τίθεσθε','τιθέσθων'],aormid:['θοῦ','θέσθω','θέσθε','θέσθων']},
+  pass:{aorpass:['τέθητι','τεθήτω','τέθητε','τεθέντων']}},
+inf:[['Pres. Act.','τιθέναι'],['Aor. Act.','θεῖναι'],['Perf. Act.','τεθηκέναι'],
+     ['Pres. Mid./Pass.','τίθεσθαι'],['Aor. Mid.','θέσθαι'],
+     ['Aor. Pass.','τεθῆναι'],['Fut. Act.','θήσειν']],
+ptc:[['Pres. Act.','τιθείς, τιθεῖσα, τιθέν (gen: τιθέντος)'],
+     ['Aor. Act.','θείς, θεῖσα, θέν (gen: θέντος)'],
+     ['Perf. Act.','τεθηκώς, -υῖα, -ός'],
+     ['Pres. Mid./Pass.','τιθέμενος, -η, -ον'],
+     ['Aor. Mid.','θέμενος, -η, -ον'],
+     ['Aor. Pass.','τεθείς, τεθεῖσα, τεθέν']],
+note:'τίθημι uses the ε-stem (reduplication τι-, stem θε-/θη-). In the singular present active the η-grade appears (τίθημι), while the plural shows the ε-grade (τίθεμεν). The aorist ἔθηκα (sg) vs ἔθεμεν (pl) shows the same alternation. The perfect passive τέθειμαι is rare in classical prose; κεῖμαι (to lie) often serves as its suppletive.'},
+
+// ─── 10. ἵστημι ───────────────────────────────────────────────
+{id:'histemi',title:'ἵστημι',pp:'ἵστημι, στήσω, ἔστησα / ἔστην, ἕστηκα, ἕσταμαι, ἐστάθην',mean:'to make stand (trans.) / to stand, stop (intrans.)',grp:'α-stem μι-verb',voices:['act','mid','pass'],
+ind:{
+  act:{
+    pres:['ἵστημι','ἵστης','ἵστησι(ν)','ἵσταμεν','ἵστατε','ἱστᾶσι(ν)'],
+    impf:['ἵστην','ἵστης','ἵστη','ἵσταμεν','ἵστατε','ἵστασαν'],
+    fut: ['στήσω','στήσεις','στήσει','στήσομεν','στήσετε','στήσουσι(ν)'],
+    aor: ['ἔστησα (trans.) / ἔστην (intrans.)','ἔστησας / ἔστης','ἔστησε / ἔστη','ἐστήσαμεν / ἔστημεν','ἐστήσατε / ἔστητε','ἔστησαν / ἔστησαν'],
+    perf:['ἕστηκα','ἕστηκας','ἕστηκε(ν)','ἑστήκαμεν','ἑστήκατε','ἑστήκασι(ν)'],
+    plpf:['εἱστήκη','εἱστήκης','εἱστήκει','εἱστήκεμεν','εἱστήκετε','εἱστήκεσαν']},
+  mid:{
+    pres:['ἵσταμαι','ἵστασαι','ἵσταται','ἱστάμεθα','ἵστασθε','ἵστανται'],
+    impf:['ἱστάμην','ἵστασο','ἵστατο','ἱστάμεθα','ἵστασθε','ἵσταντο'],
+    futmid:['στήσομαι','στήσῃ','στήσεται','στησόμεθα','στήσεσθε','στήσονται'],
+    aormid:['ἐστησάμην','ἐστήσω','ἐστήσατο','ἐστησάμεθα','ἐστήσασθε','ἐστήσαντο']},
+  pass:{
+    futpass:['σταθήσομαι','σταθήσῃ','σταθήσεται','σταθησόμεθα','σταθήσεσθε','σταθήσονται'],
+    aorpass:['ἐστάθην','ἐστάθης','ἐστάθη','ἐστάθημεν','ἐστάθητε','ἐστάθησαν'],
+    perfpass:['ἕσταμαι','ἕστασαι','ἕσταται','ἑστάμεθα','ἕστασθε','ἕστανται'],
+    plpfpass:['εἱστάμην','εἵστασο','εἵστατο','εἱστάμεθα','εἵστασθε','εἵσταντο']}},
+subj:{
+  act:{pres:['ἱστῶ','ἱστῇς','ἱστῇ','ἱστῶμεν','ἱστῆτε','ἱστῶσι(ν)'],
+       aor: ['στήσω / στῶ','στήσῃς / στῇς','στήσῃ / στῇ','στήσωμεν / στῶμεν','στήσητε / στῆτε','στήσωσι / στῶσι']},
+  mid:{pres:['ἱστῶμαι','ἱστῇ','ἱστῆται','ἱστώμεθα','ἱστῆσθε','ἱστῶνται'],
+       aormid:['στήσωμαι','στήσῃ','στήσηται','στησώμεθα','στήσησθε','στήσωνται']},
+  pass:{aorpass:['σταθῶ','σταθῇς','σταθῇ','σταθῶμεν','σταθῆτε','σταθῶσι(ν)']}},
+opt:{
+  act:{pres:['ἱσταίην','ἱσταίης','ἱσταίη','ἱσταῖμεν','ἱσταῖτε','ἱσταῖεν'],
+       fut: ['στήσοιμι','στήσοις','στήσοι','στήσοιμεν','στήσοιτε','στήσοιεν'],
+       aor: ['στήσαιμι / σταίην','στήσαις / σταίης','στήσαι / σταίη','στήσαιμεν / σταῖμεν','στήσαιτε / σταῖτε','στήσαιεν / σταῖεν']},
+  mid:{pres:['ἱσταίμην','ἱσταῖο','ἱσταῖτο','ἱσταίμεθα','ἱσταῖσθε','ἱσταῖντο'],
+       futmid:['στησοίμην','στήσοιο','στήσοιτο','στησοίμεθα','στήσοισθε','στήσοιντο'],
+       aormid:['στησαίμην','στήσαιο','στήσαιτο','στησαίμεθα','στήσαισθε','στήσαιντο']},
+  pass:{futpass:['σταθησοίμην','σταθήσοιο','σταθήσοιτο','σταθησοίμεθα','σταθήσοισθε','σταθήσοιντο'],
+        aorpass:['σταθείην','σταθείης','σταθείη','σταθείημεν','σταθείητε','σταθείησαν']}},
+imp:{
+  act:{pres:['ἵστη','ἱστάτω','ἵστατε','ἱστάντων'],aor:['στῆσον (trans.) / στῆθι (intrans.)','στησάτω / στήτω','στήσατε / στῆτε','στησάντων / στάντων']},
+  mid:{pres:['ἵστασο','ἱστάσθω','ἵστασθε','ἱστάσθων'],aormid:['στήσαι','στησάσθω','στήσασθε','στησάσθων']},
+  pass:{aorpass:['στάθητι','σταθήτω','στάθητε','σταθέντων']}},
+inf:[['Pres. Act.','ἱστάναι'],['1st Aor. Act. (trans.)','στῆσαι'],['2nd Aor. Act. (intrans.)','στῆναι'],
+     ['Perf. Act. (intrans.)','ἑστηκέναι'],
+     ['Pres. Mid./Pass.','ἵστασθαι'],['Aor. Mid.','στήσασθαι'],['Aor. Pass.','σταθῆναι']],
+ptc:[['Pres. Act.','ἱστάς, ἱστᾶσα, ἱστάν'],
+     ['1st Aor. Act. (trans.)','στήσας, -ασα, -αν'],
+     ['2nd Aor. Act. (intrans.)','στάς, στᾶσα, στάν'],
+     ['Perf. Act. (intrans.)','ἑστώς, ἑστῶσα, ἑστός (gen: ἑστῶτος)'],
+     ['Pres. Mid./Pass.','ἱστάμενος, -η, -ον'],
+     ['Aor. Pass.','σταθείς, -εῖσα, -έν']],
+note:'ἵστημι is famous for its TRANSITIVE / INTRANSITIVE distinction: the 1st Aorist (ἔστησα) is TRANSITIVE ("I set up / made X stand"); the 2nd Aorist (ἔστην) is INTRANSITIVE ("I stood up / stopped"). The Perfect (ἕστηκα) is also intransitive with present meaning ("I stand"). This same distinction applies in subjunctive, optative, imperative, infinitive, and participle forms.'}
+
+]; // end V
+
+// ═══════════════════════════════════════════════════════════════
+//  PREPOSITIONS DATA
+// ═══════════════════════════════════════════════════════════════
+const PREP_GROUPS = [
+{title:'One Case Only',rows:[
+  {prep:'ἀνά',cases:[{c:'Acc',t:'up, throughout, at the rate of',n:'Rare in classical prose with simple nouns; common in compounds (ἀναβαίνω, ἀνέρχομαι). Distributive: ἀνὰ εἴκοσι = twenty each.'}]},
+  {prep:'ἀντί',cases:[{c:'Gen',t:'instead of, in return for, in exchange for, against',n:'Often used to express substitution or equivalence. "Give X instead of Y."'}]},
+  {prep:'ἀπό',cases:[{c:'Gen',t:'from, away from, since, out of (material)',n:'Marks separation or origin in space or time. Used to express the material from which something is made. Distinguished from ἐκ which means "out from within."'}]},
+  {prep:'εἰς / ἐς',cases:[{c:'Acc',t:'into, to, toward, for (purpose), up to, until',n:'ἐς is the older/Ionic form; εἰς is standard Attic. Always with accusative: motion toward a goal or purpose.'}]},
+  {prep:'ἐκ / ἐξ',cases:[{c:'Gen',t:'out of (from within), from, as a result of',n:'ἐξ before vowels. Expresses exit from the interior of a space. Distinguishes from ἀπό (away from the surface/area). Used to express agent in compound passives.'}]},
+  {prep:'ἐν',cases:[{c:'Dat',t:'in, on, among, within, in the power of',n:'Fundamental locative preposition. With collective nouns: ἐν τοῖς πολεμίοις = among the enemies. In military context: ἐν τάξει = in formation.'}]},
+  {prep:'πρό',cases:[{c:'Gen',t:'before (time/place), in front of, in defense of, for',n:'Can be temporal (before), spatial (in front of), or figurative (in defense of). Common in compound verbs (προβάλλω, πρόκειμαι).'}]},
+  {prep:'σύν / ξύν',cases:[{c:'Dat',t:'with, together with, in accordance with, by means of',n:'σύν is Attic; ξύν is Ionic/poetic. Less common than μετά + gen in classical Attic. Always denotes accompaniment or co-operation.'}]},
+  {prep:'ὡς',cases:[{c:'Acc',t:'to (the presence of), to (a person)',n:'Used only with persons; takes accusative. Poetic and dialectal. "He went to the king" = ἦλθε ὡς τὸν βασιλέα.'}]},
+]},
+{title:'Two Cases',rows:[
+  {prep:'διά',cases:[
+    {c:'Gen',t:'through, by means of, across, throughout',n:'Through a medium or space. With abstract nouns: by means of, on account of. διὰ τῆς χώρας = through the country.'},
+    {c:'Acc',t:'because of, on account of, for the sake of, through (time)',n:'Expresses cause or reason. διὰ τί; = "why?" (because of what?). διὰ χρόνου = after/through a period of time.'}]},
+  {prep:'κατά',cases:[
+    {c:'Gen',t:'down from, down against, against, throughout',n:'Spatial: down from a height. Hostile: κατά τινος λέγειν = to speak against someone. κατὰ τῆς κεφαλῆς = over/onto the head (motion downward).'},
+    {c:'Acc',t:'down along, throughout, according to, in respect of, at (time)',n:'κατὰ νόμον = according to law. κατὰ τὴν Ἑλλάδα = throughout Greece. κατὰ τοῦτον τὸν χρόνον = at this time.'}]},
+  {prep:'μετά',cases:[
+    {c:'Gen',t:'with, together with, in company with, in concert with',n:'Denotes accompaniment or association. Distinguished from σύν (which is more literal); μετά + gen is more common in Attic for abstract association.'},
+    {c:'Acc',t:'after (time), in pursuit of, next to',n:'Temporal succession: μετὰ τὴν μάχην = after the battle. Also: second after, next to (in rank or position).'}]},
+  {prep:'περί',cases:[
+    {c:'Gen',t:'about, concerning, regarding, on behalf of',n:'Used with verbs of speaking, thinking, caring. περὶ τῆς εἰρήνης λέγειν = to speak about peace. Overlap with ὑπέρ + gen in the "on behalf of" sense.'},
+    {c:'Acc',t:'around (space), about (number), in the area of (time)',n:'Spatial: around a place. Approximate number: περὶ τριακοσίους = about three hundred. περὶ δείλην = around evening.'}]},
+  {prep:'ὑπέρ',cases:[
+    {c:'Gen',t:'on behalf of, in defense of, over (rest), above, about',n:"Used with verbs of fighting, dying, speaking for someone. ὑπὲρ τῆς πόλεως = on behalf of the city. Spatial: ὑπὲρ τῆς κεφαλῆς = above the head (at rest)."},
+    {c:'Acc',t:'over (motion), beyond, more than, in excess of',n:"Motion over or across. Figurative excess: ὑπὲρ δύναμιν = beyond one's power. ὑπὲρ τὸν ποταμόν = across/over the river (motion)."}]},
+  {prep:'ὑπό',cases:[
+    {c:'Gen',t:'by (agent in passive constructions), under (motion from), from under',n:'Most important use: marks the agent with passive verbs (equivalent to Latin "a/ab"). ἐτιμήθη ὑπὸ τῶν πολιτῶν = "he was honored by the citizens."'},
+    {c:'Acc',t:'under (motion toward), about (time), during (with conditions)',n:'Motion going under. Temporal: ὑπὸ νύκτα = about nightfall, under cover of night.'}]},
+]},
+{title:'Three Cases',rows:[
+  {prep:'ἀμφί',cases:[
+    {c:'Gen',t:'about, concerning, for the sake of',n:'Largely poetic/older with genitive. Expresses the subject of concern.'},
+    {c:'Dat',t:'on both sides of, around, near, at',n:'Around a point (both sides). Rare in classical Attic; mainly in poetry.'},
+    {c:'Acc',t:'around, about (space), approximately (number), concerning',n:'Spatial: around a place or person. ἀμφὶ τοὺς Πέρσας = concerning/around the Persians.'}]},
+  {prep:'ἐπί',cases:[
+    {c:'Gen',t:'on, upon (position), over, in the time of, in charge of',n:'ἐπὶ τῆς νεώς = on the ship (at rest). ἐπὶ Σωκράτους = in the time of Socrates. ἐπί + gen of commander = under the command of.'},
+    {c:'Dat',t:'on, at, near, for (purpose), in addition to, upon (condition)',n:'ἐπὶ τῷ ποταμῷ = at the river. ἐπὶ τούτῳ = on this condition. ἐπὶ τῇ εἰρήνῃ = for peace (purpose of negotiations).'},
+    {c:'Acc',t:'onto, against, toward, for (goal), along, over (extent)',n:'Motion onto a surface. Hostile: ἐπὶ τοὺς πολεμίους = against the enemy. Extent: ἐπὶ πολύ = over a great distance / for a long time.'}]},
+  {prep:'παρά',cases:[
+    {c:'Gen',t:'from (a person), from beside, from the side of',n:'Used only with persons (not places); for places use ἀπό or ἐκ. παρὰ τοῦ βασιλέως = from the king.'},
+    {c:'Dat',t:'beside, with, at the house of, in the power of, in the opinion of',n:"Rest beside a person or place. παρὰ τῷ βασιλεῖ = at the king's court / with the king. Indicates possession of opinion: παρ᾿ ἐμοί = in my view."},
+    {c:'Acc',t:'beside, along, past, to (a person), compared with, contrary to',n:"Motion to beside: παρὰ τὸν βασιλέα = to the king's presence. παρὰ φύσιν = contrary to nature. παρὰ τοὺς νόμους = contrary to the laws."}]},
+  {prep:'πρός',cases:[
+    {c:'Gen',t:'from (the side of), in favor of, by (oath), facing',n:'Origin from a side. πρὸς θεῶν = by the gods (oath). πρὸς τοῦ δικαίου ἐστίν = it is on the side of justice.'},
+    {c:'Dat',t:'at, near, in addition to, facing, beside',n:'Rest near a place. πρὸς τούτοις = in addition to these things. Relatively rare in classical Attic with dative.'},
+    {c:'Acc',t:'to, toward, against, with reference to, in relation to, in comparison with',n:'The most common use. Motion toward. Hostile: πρὸς τοὺς πολεμίους = against the enemy. πρὸς ταῦτα = in view of this. πρὸς ἕω = toward the east.'}]},
+]}
+];
+
+// ═══════════════════════════════════════════════════════════════
+//  STATE
+// ═══════════════════════════════════════════════════════════════
+let activeVerb = 0;
+let voiceState = {};
+let moodState  = {};
+
+function getVoice(id) { return voiceState[id] || 'act'; }
+function getMood(id)  { return moodState[id]  || 'ind'; }
+
+// ═══════════════════════════════════════════════════════════════
+//  TENSE CONFIG
+// ═══════════════════════════════════════════════════════════════
+const IND_TENSES = {
+  act:  [{k:'pres',l:'Present'},{k:'impf',l:'Imperfect'},{k:'fut',l:'Future'},{k:'aor',l:'Aorist'},{k:'perf',l:'Perfect'},{k:'plpf',l:'Pluperfect'}],
+  mid:  [{k:'pres',l:'Present'},{k:'impf',l:'Imperfect'},{k:'futmid',l:'Fut. Mid.'},{k:'aormid',l:'Aor. Mid.'}],
+  pass: [{k:'futpass',l:'Fut. Pass.'},{k:'aorpass',l:'Aor. Pass.'},{k:'perfpass',l:'Perf. Pass.'},{k:'plpfpass',l:'Plpf. Pass.'}]
+};
+const SUBJ_TENSES = {
+  act:  [{k:'pres',l:'Present'},{k:'aor',l:'Aorist'}],
+  mid:  [{k:'pres',l:'Present'},{k:'aormid',l:'Aor. Mid.'}],
+  pass: [{k:'aorpass',l:'Aor. Pass.'}]
+};
+const OPT_TENSES = {
+  act:  [{k:'pres',l:'Present'},{k:'fut',l:'Future'},{k:'aor',l:'Aorist'}],
+  mid:  [{k:'pres',l:'Present'},{k:'futmid',l:'Fut. Mid.'},{k:'aormid',l:'Aor. Mid.'}],
+  pass: [{k:'futpass',l:'Fut. Pass.'},{k:'aorpass',l:'Aor. Pass.'}]
+};
+const IMP_TENSES = {
+  act:  [{k:'pres',l:'Present'},{k:'aor',l:'Aorist'},{k:'perf',l:'Perfect'}],
+  mid:  [{k:'pres',l:'Present'},{k:'aormid',l:'Aor. Mid.'}],
+  pass: [{k:'aorpass',l:'Aor. Pass.'}]
+};
+
+// ═══════════════════════════════════════════════════════════════
+//  RENDER HELPERS
+// ═══════════════════════════════════════════════════════════════
+function cell(f) {
+  if (!f || f === '—') return '<td><span class="d">—</span></td>';
+  return `<td><em>${f}</em></td>`;
+}
+
+function renderFiniteTable(data, tenseConfig, voice) {
+  if (!data) return `<p class="warn-note">No ${vcLabel(voice)} forms for this verb.</p>`;
+  const tenses = tenseConfig.filter(t => data[t.k]);
+  if (!tenses.length) return '<p class="warn-note">No forms available.</p>';
+  const hClass = vc(voice);
+  let h = '<div class="table-wrap"><table class="ct"><thead><tr><th class="h-base" style="width:40px;"></th>';
+  tenses.forEach(t => h += `<th class="${hClass}">${t.l}</th>`);
+  h += '</tr></thead><tbody>';
+  P6.forEach((p, i) => {
+    h += `<tr><th>${p}</th>`;
+    tenses.forEach(t => h += cell(data[t.k] ? data[t.k][i] : null));
+    h += '</tr>';
+  });
+  h += '</tbody></table></div>';
+  return h;
+}
+
+function renderImpTable(data, tenseConfig, voice) {
+  if (!data) return `<p class="warn-note">No ${vcLabel(voice)} imperative forms for this verb.</p>`;
+  const tenses = tenseConfig.filter(t => data[t.k]);
+  if (!tenses.length) return '<p class="warn-note">No imperative forms.</p>';
+  const hClass = vc(voice);
+  let h = '<div class="table-wrap"><table class="ct"><thead><tr><th class="h-base" style="width:40px;"></th>';
+  tenses.forEach(t => h += `<th class="${hClass}">${t.l}</th>`);
+  h += '</tr></thead><tbody>';
+  IMP4.forEach((p, i) => {
+    h += `<tr><th>${p}</th>`;
+    tenses.forEach(t => h += cell(data[t.k] ? data[t.k][i] : null));
+    h += '</tr>';
+  });
+  h += '</tbody></table></div>';
+  return h;
+}
+
+function renderNF(verb) {
+  let h = '<div class="nf-grid">';
+  h += '<div class="nf-block"><h4>Infinitives</h4>';
+  if (verb.inf && verb.inf.length) {
+    h += '<table class="nft"><tbody>';
+    verb.inf.forEach(([l, f]) => h += `<tr><th>${l}</th><td><em>${f}</em></td></tr>`);
+    h += '</tbody></table>';
+  } else h += '<p class="note">None.</p>';
+  h += '</div>';
+  h += '<div class="nf-block"><h4>Participles</h4>';
+  if (verb.ptc && verb.ptc.length) {
+    h += '<table class="nft"><tbody>';
+    verb.ptc.forEach(([l, f]) => h += `<tr><th>${l}</th><td><em>${f}</em></td></tr>`);
+    h += '</tbody></table>';
+  } else h += '<p class="note">None.</p>';
+  h += '</div>';
+  h += '</div>';
+  return h;
+}
+
+// ═══════════════════════════════════════════════════════════════
+//  MAIN RENDER
+// ═══════════════════════════════════════════════════════════════
+function renderVerb(verb) {
+  const voice = getVoice(verb.id);
+  const mood  = getMood(verb.id);
+  const hasMultiVoice = verb.voices && verb.voices.length > 1;
+  const voices = verb.voices || ['act'];
+
+  let h = '';
+  h += `<div class="verb-header">
+    <div class="verb-title">${verb.title}</div>
+    <div class="verb-meaning">${verb.mean}</div>
+    <span class="verb-badge">${verb.grp}</span>
+    <div class="verb-pp">${verb.pp}</div>
+  </div>`;
+  h += '<div class="divider" style="margin:8px 0 14px;"></div>';
+
+  if (verb.contractNote) {
+    h += `<p class="note" style="margin-bottom:12px; border-left:2px solid var(--gold); padding-left:10px; font-size:.78rem;">${verb.contractNote}</p>`;
+  }
+
+  h += '<div class="nav-row">';
+  if (hasMultiVoice) {
+    h += '<div class="voice-toggle">';
+    voices.forEach(v => {
+      const cls = voice === v ? ` v-${v}` : '';
+      h += `<button class="voice-btn${cls}" onclick="setVoice('${verb.id}','${v}')">${vcLabel(v)}</button>`;
+    });
+    h += '</div>';
+  } else {
+    h += '<div class="voice-only-label">Active Voice Only</div>';
+  }
+  h += '<div class="mood-toggle">';
+  ['ind','subj','opt','imp','nf'].forEach(m => {
+    const labels = {ind:'Indicative',subj:'Subjunctive',opt:'Optative',imp:'Imperative',nf:'Non‑Finite'};
+    const cls = mood === m ? ' m-active' : '';
+    h += `<button class="mood-btn${cls}" onclick="setMood('${verb.id}','${m}')">${labels[m]}</button>`;
+  });
+  h += '</div>';
+  h += '</div>';
+
+  if (mood === 'ind') {
+    h += '<div class="section">';
+    h += '<div class="section-title">Indicative Mood</div>';
+    if (voice === 'pass') {
+      h += '<p class="note" style="margin-bottom:8px;">⚠ Present &amp; Imperfect Passive = identical to Middle forms. Showing only distinctly passive tenses.</p>';
+    }
+    const tconf = IND_TENSES[voice] || IND_TENSES.act;
+    const data  = verb.ind ? verb.ind[voice] : null;
+    h += renderFiniteTable(data, tconf, voice);
+    h += '</div>';
+  } else if (mood === 'subj') {
+    h += '<div class="section">';
+    h += '<div class="section-title">Subjunctive Mood</div>';
+    h += '<p class="note" style="margin-bottom:8px;">The subjunctive has no future tense. It uses the lengthened thematic vowel (ω/η) as its characteristic mood sign.</p>';
+    const tconf = SUBJ_TENSES[voice] || SUBJ_TENSES.act;
+    const data  = verb.subj ? verb.subj[voice] : null;
+    h += renderFiniteTable(data, tconf, voice);
+    h += '</div>';
+  } else if (mood === 'opt') {
+    h += '<div class="section">';
+    h += '<div class="section-title">Optative Mood</div>';
+    h += '<p class="note" style="margin-bottom:8px;">The optative uses -οι- (thematic verbs) or -ιη-/-ι- (athematic/aorist passive) as its characteristic mood sign. It has no perfect active optative in regular use.</p>';
+    const tconf = OPT_TENSES[voice] || OPT_TENSES.act;
+    const data  = verb.opt ? verb.opt[voice] : null;
+    h += renderFiniteTable(data, tconf, voice);
+    h += '</div>';
+  } else if (mood === 'imp') {
+    h += '<div class="section">';
+    h += '<div class="section-title">Imperative Mood</div>';
+    h += '<p class="note" style="margin-bottom:8px;">Only 2nd and 3rd person forms exist. The 3rd person plural is sometimes called the "indirect imperative." The Aorist Passive imperative uses active endings.</p>';
+    const tconf = IMP_TENSES[voice] || IMP_TENSES.act;
+    const data  = verb.imp ? verb.imp[voice] : null;
+    h += renderImpTable(data, tconf, voice);
+    h += '</div>';
+  } else if (mood === 'nf') {
+    h += '<div class="section">';
+    h += '<div class="section-title">Non-Finite Forms — All Voices</div>';
+    h += renderNF(verb);
+    h += '</div>';
+  }
+
+  if (verb.note) {
+    h += `<div class="note verb-note">${verb.note}</div>`;
+  }
+
+  document.getElementById('content-area').innerHTML = h;
+}
+
+function renderPrepositions() {
+  let h = '';
+  h += `<div style="text-align:center;margin:16px 0 10px;">
+    <div style="font-family:'Cinzel',serif;font-weight:900;font-size:1.4rem;color:var(--ink);letter-spacing:.1em;">Προθέσεις &mdash; Greek Prepositions</div>
+    <div style="font-style:italic;font-size:.9rem;color:var(--faded);margin-top:4px;">Cases, Meanings, and Usage Notes</div>
+  </div>`;
+  h += '<div class="divider" style="margin:8px 0 18px;"></div>';
+
+  PREP_GROUPS.forEach(grp => {
+    h += `<div class="prep-section-title">${grp.title}</div>`;
+    h += '<table class="prept"><thead><tr><th style="width:9%;">Prep.</th><th style="width:8%;">Case</th><th style="width:32%;">Core Meaning</th><th>Usage Notes</th></tr></thead><tbody>';
+    grp.rows.forEach(row => {
+      const nCases = row.cases.length;
+      row.cases.forEach((c, ci) => {
+        const caseColor = c.c === 'Gen' ? 'case-gd' : c.c === 'Dat' ? 'case-dt' : 'case-ac';
+        h += '<tr>';
+        if (ci === 0) h += `<th rowspan="${nCases}" style="font-size:1.05rem;text-align:center;letter-spacing:.04em;">${row.prep}</th>`;
+        h += `<td class="case-badge"><span class="${caseColor}">${c.c}</span></td>`;
+        h += `<td class="meaning">${c.t}</td>`;
+        h += `<td class="notes">${c.n}</td>`;
+        h += '</tr>';
+      });
+    });
+    h += '</tbody></table>';
+  });
+
+  h += '<div class="note" style="border-left:2px solid var(--gold);padding-left:12px;margin-top:8px;font-size:.78rem;line-height:1.6;">';
+  h += '<strong>General rules:</strong> ';
+  h += 'Prepositions with <span class="case-gd">Genitive</span> typically express separation, source, or agent. ';
+  h += 'Prepositions with <span class="case-dt">Dative</span> typically express rest or location (the dative is the "rest" case). ';
+  h += 'Prepositions with <span class="case-ac">Accusative</span> typically express motion or direction. ';
+  h += 'For three-case prepositions, remember: Gen = from/about, Dat = at/beside (rest), Acc = to/toward (motion). ';
+  h += 'Prepositions in compounds often modify their base meaning: ἀνα- = up/back, κατα- = down/against, παρα- = beside/contrary, ἐπι- = upon/in addition, ἐκ- = out, ἀπο- = away, προ- = before, συν- = together.';
+  h += '</div>';
+
+  document.getElementById('content-area').innerHTML = h;
+}
+
+function setVoice(id, voice) {
+  voiceState[id] = voice;
+  const verb = V.find(v => v.id === id);
+  if (verb) renderVerb(verb);
+}
+
+function setMood(id, mood) {
+  moodState[id] = mood;
+  const verb = V.find(v => v.id === id);
+  if (verb) renderVerb(verb);
+}
+
+function activate(verbIdxOrPrep) {
+  document.querySelectorAll('.verb-tab').forEach(t => t.classList.remove('active'));
+  const tab = document.querySelector(`[data-verb="${verbIdxOrPrep}"]`);
+  if (tab) tab.classList.add('active');
+  if (verbIdxOrPrep === 'prep') {
+    activeVerb = 'prep';
+    renderPrepositions();
+  } else {
+    activeVerb = verbIdxOrPrep;
+    renderVerb(V[activeVerb]);
+  }
+}
+
+// ─── BUILD TABS ──────────────────────────────────────────────
+const regVerbs = [0, 1, 2, 3];
+const irrVerbs = [4, 5, 6, 7, 8, 9, 10];
+
+regVerbs.forEach(i => {
+  const tab = document.createElement('div');
+  tab.className = 'verb-tab' + (i === 0 ? ' active' : '');
+  tab.dataset.verb = i;
+  tab.innerHTML = V[i].title;
+  tab.addEventListener('click', () => activate(i));
+  document.getElementById('tab-row-reg').appendChild(tab);
+});
+
+irrVerbs.forEach(i => {
+  const tab = document.createElement('div');
+  tab.className = 'verb-tab';
+  tab.dataset.verb = i;
+  tab.innerHTML = V[i].title;
+  tab.addEventListener('click', () => activate(i));
+  document.getElementById('tab-row-irr').appendChild(tab);
+});
+
+document.querySelector('.prep-tab').addEventListener('click', () => activate('prep'));
+
+// ─── INITIAL RENDER ──────────────────────────────────────────
+renderVerb(V[0]);
